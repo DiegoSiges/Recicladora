@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ReciclAds</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Reciclads" />
+    <link rel="icon" type="image/png" href="./static/images/icons/favicon.png" />
+    <meta name="keywords" content="reciclads, recycle, bottles, reciclado, botellas, catamarca, next innovation lab" />
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css" type="text/css" media="all">
+    <link rel="stylesheet" href="./static/css/jquery.fullPage.css" type="text/css" />
+    <link rel="stylesheet" href="./static/css/style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./static/css/util.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./static/fonts/font-awesome-4.7.0/css/font-awesome.css" type="text/css"  media="screen"/>
+
+
+</head>
+
+<body style="background-color: #024995;">
+
+    <div id="fullpage">
+        <div class="section" data-anchor="page1">
+
+            <!-- SECCION 1 -->
+            <div class="slide green">
+
+                <!-- Imagen de la pantalla -->
+                <div class="">
+                    <div class="">
+                        <img src="./static/images/contador-botella.jpeg">                    
+                    </div>
+                    <div style=" position: absolute; z-index: 1; color: blue; font-size: 11px">
+                        <h1 style="position: relative; left: 540px; bottom: 225px; background-color:; text-align:center; width: 190px; color: #1D2FB5"
+				class="numero_botellas" id="botellas">0</h1>
+                    </div>
+                </div>
+
+                <!-- Numero para contar -->
+                <div>
+                    
+                </div>
+
+            </div>
+
+            <!-- SECCION 2 -->
+            <div class="slide green" data-anchor="slide2">
+
+                <!-- Imagen de la pantalla -->
+                <div>
+                    <div>
+                        <img src="./static/images/qr.jpeg">
+                    </div>
+                    <!-- Cuadro de QR -->
+                    <div style="position: relative; z-index: 1; border: 1px solid black;">
+                        <div style="position: absolute; right:73px; bottom: 202px;background: #ffff; padding: 10px; border:1px solid white">
+                            <div id="qrcode"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCION 3 -->
+            <div class="slide green" data-anchor="slide3" id="slide_cupones">
+                <div class="">
+                    <img src="./static/images/maquina-llena.jpeg">
+                </div>
+            </div>
+
+            <!-- SECCION 4 -->
+            <div class="slide green" data-anchor="slide4" id="slide_cupones">
+                <div class="">
+                    <img src="./static/images/insertar-contenedor.jpg">
+                </div>
+            </div>
+
+            <!-- SECCION PARA ACOMODAR -->
+            <div class="slide green mt-1 ml-4" data-anchor="slide1"></div>
+        </div>
+    </div>
+
+    <!-- The JavaScript -->
+    <script src="./static/js/jquery-3.3.1.min.js"></script>
+    <script src="./static/js/bootstrap.min.js"></script>
+    <script src="./static/js/jquery.fullPage.js"></script>
+    <script src="./static/js/socketio.js"></script>
+    <script src="./static/js/qrcode.js"></script>
+    <script src="./static/js/hashids.js"></script>
+
+
+    <!-- Script iniciador de fullpage -->
+    <script>
+        $('#fullpage').fullpage({
+            anchors: ['page1'],
+            controlArrows: false,
+        });
+    </script>
+
+    <!-- Script contador de Botellas -->
+    <script>
+        var contador_botellas = document.getElementById("botellas");
+        var input_botellas = document.getElementById("input_botellas");
+        var botellas = 0;
+        var maquina = 0;
+        var ecobillete = 1;
+        var date;
+        var socket = io.connect('http://localhost:3000');
+        var qrcode = new QRCode("qrcode");
+        var hashids = new Hashids("cwejjwevfewiufghewoeofhweco", 20);
+        var uuid = createUUID();
+        var id_maquina = 513; 	
+
+        function createUUID() {
+            var s = [];
+            var intDigits = "0123456789";
+            for (var i = 0; i < 20; i++) {
+                s[i] = intDigits.substr(Math.floor(Math.random() * 0x10), 1);
+            }
+            s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+            s[19] = intDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+            return parseInt(s.join(""));
+        }
+
+
+
+	//location.href = '#page1/slide2';
+
+        //Conexion con Arduino
+        socket.on('arduino:data', function (message) {
+		console.log(message.data);
+            data = Number(message.data);
+	        console.log(data);
+
+            if (data == 1) {              
+                  verifyMethod();
+                  location.href = '#page1/slide2'; //Pasa a la pantalla de la QR
+	    }
+            else if (data == 2) {
+                location.href = '#page1/slide3'; //Pasa a la pantalla de llenado
+            }
+            else if (data == 6) {
+                location.href = '#page1/slide4'; //Pasa a la pantalla a insertar contenedor
+            }
+            else if (data == 4) {
+                incrementar(); //Cuenta las botellas
+            }
+            else if (data == 0) {
+                clearAll(); // Vuelve a la pantalla de contar y reinicia el contador
+                location.href = '#page1/';
+            }
+
+
+        });
+
+
+        const incrementar = function () {
+            botellas++;
+            contador_botellas.innerHTML = botellas;
+        };
+
+        verifyMethod = function () {
+
+            if (parseInt(botellas) < 1) {
+                $('#exampleModal2').modal('show');
+            }
+            else {
+                input_botellas = botellas;
+                codeGen();
+                location.href = '#page1/slide2';
+            }
+        }
+
+
+        const codeGen = () => {
+            date = new Date();
+            var code = hashids.encode([botellas, maquina, date.getMonth(), date.getDay(), date.getHours(), date.getMinutes(), id_maquina, uuid, createUUID()]);
+            qrcode.makeCode(code);
+        }
+
+        const clearAll = () => {
+            qrcode.clear();
+            input_botellas = 0;
+            botellas = 0;
+            contador_botellas.innerHTML = 0;
+            location.href = '#page1/slide1';
+        }
+
+    </script>
+
+    <script>
+        $('#exampleModal1').on('shown.bs.modal', function () {
+            $('#exampleModalLabel').focus()
+        })
+    </script>
+
+    <script>
+        $('.alert').alert()
+    </script>
+</body>
+
+</html>
