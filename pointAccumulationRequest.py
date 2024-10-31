@@ -1,8 +1,11 @@
 #
 # 
-# Point Accumulation Request API call. This script requires to configuration files. One is siges_data.cfg, which consists of two lines. 
+# Point Accumulation Request API call. This script requires to configuration files. 
+# One is siges_data.cfg, which consists of two lines. 
 # The first line contains the apies, and the second contains the point of sale. 
-# The second file is siges_numTrans.cfg, that contains only one number. This is the initial transaction number to be used in the API requests.
+# 
+# The second file is siges_numTrans.cfg, that contains only one number. This is the 
+# initial transaction number to be used in the API requests.
 # This file is updated with the next transaction number to be used.  
 #
 
