@@ -55,6 +55,14 @@
                         <div style="position: absolute; right:73px; bottom: 202px;background: #ffff; padding: 10px; border:1px solid white">
                             <div id="qrcode"></div>
                         </div>
+                    <!--/div-->
+<!-- Adding the static image on top of the qr code because when the qrcode is eliminated, the script stops responding to Arduino inputs. 
+ Check later how to eliminate qrcode.-->                    
+                        <div style="position: absolute; right:73px; bottom: 202px;background: #ffff; padding: 10px; border:1px solid white">
+                            <div> 
+                                <img src="./static/images/QR_Sample.png" width="256" height="256"> 
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
