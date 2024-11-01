@@ -19,12 +19,35 @@ const sport = new SerialPort('/dev/ttyACM0', () => { ///dev/ttyACM0
   console.log('Puerto abierto');
 });
 
+/* Original sport.on function. Modified below */
 sport.on('data', function(data){
   console.log(data.toString());
   io.emit('arduino:data', {
     data:data.toString()
   });
 });
+
+
+/*
+sport.on('data', function(data){
+  inputData=data.toString();
+  
+  console.log(inputdata);
+  io.emit('arduino:data', {
+    data:inputdata
+  });
+
+  const { spawn } = require ('child_process');
+  const dummyOutput = [];
+
+  const pyCatcher = spawn('python', ['dummy2.py', inputData]);
+  pyCatcher.stdout.on('data', function(data) {
+    dummyOutput.push(parseFloat(data));
+    console.log(dummyOutput);
+  });
+
+}); */
+
 
 let connectedSocket = null;
 function onConnection(socket){
@@ -39,13 +62,24 @@ server.on("connection", (socket) => {
 
 // data=1: pag QR. =2:pag llenado. =4:incr cuenta botellas. =6: pag insertar 
 // contenedor. =0: pag inicio con contador reiniciado
+// Data passed to Siges Python script: 0 to reinitiate bottle counter; 4 to increment counter; 
+// 1 to send accumulation intention
+// The Siges Python script will have to return a value indicating success or failure sending the 
+// accumulation request. What to do then? A new page may have to be shown indicating the total #
+// of bottles that could not be reported (?) 
 		
-		io.emit('arduino:data',{data:"1"});
+// Variable arduinoData holds the value reported by Arduino, which is passed to
+//index.html and to python
+const arduinoData="1" 
 
-		const { spawn } = require ('child_process');
+
+io.emit('arduino:data',{data:arduinoData});
+
+
+    const { spawn } = require ('child_process');
 		const dummyOutput = [];
 
-		const pyCatcher = spawn('python', ['dummy2.py', '5']);
+		const pyCatcher = spawn('python', ['dummy2.py', arduinoData]);
 		pyCatcher.stdout.on('data', function(data) {
 			dummyOutput.push(parseFloat(data));
 			console.log(dummyOutput);
