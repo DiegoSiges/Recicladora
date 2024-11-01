@@ -22,13 +22,13 @@ def incrTransactNum(numTransaction):
         file.write(str(numTransaction))
     return
      
-# Produces current date and time in the following format: "09/09/2024 11:23:42"
+# Produces current date and time in the following format: "YYYY-MM-DDTHH:MM:SS. E.g. "2024-11-01T09:11:42"
+# Follows a working example I was given, but does not comply fully with the format in "API SIGES Integracion IVOS
+#  Acumulacion_V1.0.pdf, because it does not specify time zone.
 def mkFecha():
     import datetime
-    current_time = datetime.datetime.now()
-    date = str(current_time.day) + '/' + str(current_time.month) + '/' +  str(current_time.year)
-    time = str(current_time.hour) + ':' + str(current_time.minute) + ':' + str(current_time.second)
-    return date + ' ' + time
+    current_time = datetime.datetime.now().isoformat(timespec='seconds')
+    return current_time
 
 # Function to get the Punto de Venta params from cfg file in plain txt format of one param per line. Previous file format was 
 # JSON. Returns list with params.    
