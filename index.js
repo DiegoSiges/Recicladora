@@ -79,7 +79,7 @@ io.emit('arduino:data',{data:arduinoData});
     const { spawn } = require ('child_process');
 		const dummyOutput = [];
 
-		const pyCatcher = spawn('python', ['dummy2.py', arduinoData]);
+		const pyCatcher = spawn('python', ['pointAccumulationRequest.py', arduinoData]);
 		pyCatcher.stdout.on('data', function(data) {
 			dummyOutput.push(parseFloat(data));
 			console.log(dummyOutput);

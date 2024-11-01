@@ -71,6 +71,16 @@ def recTransaction (reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,pro
 
 
 
+import sys
+
+x=sys.argv[1]+"1"
+
+with open("pAccuLog.log", "a") as file:
+	file.write(x);
+
+
+
+
 
 import requests
 
@@ -79,7 +89,7 @@ reqApies = paramsPuntoVenta[0]
 reqSalePoint= paramsPuntoVenta[1]
 
 # Print the retrieved data
-print(f"apies {reqApies}\npuntoVenta: {reqSalePoint}")
+# print(f"apies {reqApies}\npuntoVenta: {reqSalePoint}")
 reqApiUlrl = "https://siges.dev/api/YVOSGenerarAcumulacion"
 
 reqNum = getNumTransaction()
@@ -103,10 +113,12 @@ todo = {"apies": reqApies, "puntoVenta": reqSalePoint, "idTransaccion": reqId, \
         "cantidad": prodQuantity, "precUnit": prodUnitPrice, "cambioPrecio": prodPriceChange}], "descuentos": discounts}
 
 
-print(todo)
+#print(todo)
 
 response = requests.post(reqApiUlrl, json=todo)
-print(response.json())
-print(response.status_code)
+#print(response.json())
+#print(response.status_code)
 incrTransactNum(int(reqNum))
 recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, response.status_code, response.json());
+
+print (x, flush=True, end='')
