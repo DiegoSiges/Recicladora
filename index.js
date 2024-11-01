@@ -36,12 +36,16 @@ server.on("connection", (socket) => {
   console.log(`Cliente conectado`);
 
 //	Command to force a slide change
-		io.emit('arduino:data',{data:"6"});
+
+// data=1: pag QR. =2:pag llenado. =4:incr cuenta botellas. =6: pag insertar 
+// contenedor. =0: pag inicio con contador reiniciado
+		
+		io.emit('arduino:data',{data:"1"});
 
 		const { spawn } = require ('child_process');
 		const dummyOutput = [];
 
-		const pyCatcher = spawn('python', ['dummy.py']);
+		const pyCatcher = spawn('python', ['dummy2.py', '5']);
 		pyCatcher.stdout.on('data', function(data) {
 			dummyOutput.push(parseFloat(data));
 			console.log(dummyOutput);
