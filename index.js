@@ -70,8 +70,7 @@ server.on("connection", (socket) => {
 		
 // Variable arduinoData holds the value reported by Arduino, which is passed to
 //index.html and to python
-const arduinoData="1" 
-
+const arduinoData="1"; 
 
 io.emit('arduino:data',{data:arduinoData});
 
@@ -79,7 +78,7 @@ io.emit('arduino:data',{data:arduinoData});
     const { spawn } = require ('child_process');
 		const dummyOutput = [];
 
-		const pyCatcher = spawn('python', ['pointAccumulationRequest.py', arduinoData]);
+		const pyCatcher = spawn('python', ['siges_ArduinoInputHandler.py', arduinoData]);
 		pyCatcher.stdout.on('data', function(data) {
 			dummyOutput.push(parseFloat(data));
 			console.log(dummyOutput);
