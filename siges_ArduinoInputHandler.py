@@ -139,7 +139,7 @@ def sendAccRequest():
                 "cantidad": prodQuantity, "precUnit": prodUnitPrice, "cambioPrecio": prodPriceChange}], "descuentos": discounts}
 
 
-        print(todo)
+        #print(todo)
 
         response = requests.post(reqApiUlrl, json=todo)
         #print(response.json())
