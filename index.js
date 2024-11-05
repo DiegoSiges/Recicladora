@@ -15,38 +15,66 @@ app.get('/test', function (req, res) {
 
 app.use(express.static('public'));
 
-const sport = new SerialPort('/dev/ttyACM0', () => { ///dev/ttyACM0
+//const sport = new SerialPort('/dev/ttyACM0', () => { ///dev/ttyACM0
+  const sport = new SerialPort('/dev/ttyUSB0', () => { ///dev/ttyACM0
   console.log('Puerto abierto');
 });
 
-/* Original sport.on function. Modified below */
+/* Original sport.on function. Modified below  
 sport.on('data', function(data){
   console.log(data.toString());
   io.emit('arduino:data', {
     data:data.toString()
   });
-});
+}); */
 
 
-/*
+/* This file is written now to be used with the USB port of an Arduino clone. 
+The clone report a USB interface, not an ACM interface, sending the same value
+multiple times. For that reason, there is an if statement below to take only one
+of those values. Still, somehow the siges...py is called multiple times. This
+must be corrected. */
+
 sport.on('data', function(data){
-  inputData=data.toString();
   
-  console.log(inputdata);
+  inputData=data.toString();
+  console.log(inputData);
+  /*console.log(inputdata);
   io.emit('arduino:data', {
     data:inputdata
-  });
+  });*/
+
+
+  let arduinoData="7";
+
+  if (inputData.search("1")>=0){
+    arduinoData="1";
+  }  
+  else if (inputData.search("4")>=0){
+    arduinoData="4";
+  }
+  else if (inputData.search("0")>=0){ 
+    arduinoData="0";
+  }
+  console.log("ArduinoData: ");
+  console.log(arduinoData);
+
+  // const arduinoData="0"; 
+
+  io.emit('arduino:data',{data:arduinoData});
+
+
 
   const { spawn } = require ('child_process');
   const dummyOutput = [];
 
-  const pyCatcher = spawn('python', ['dummy2.py', inputData]);
+  const pyCatcher = spawn('python', ['siges_ArduinoInputHandler.py', arduinoData]);
   pyCatcher.stdout.on('data', function(data) {
     dummyOutput.push(parseFloat(data));
     console.log(dummyOutput);
   });
 
-}); */
+});
 
 
 let connectedSocket = null;
@@ -70,7 +98,7 @@ server.on("connection", (socket) => {
 		
 // Variable arduinoData holds the value reported by Arduino, which is passed to
 //index.html and to python
-const arduinoData="1"; 
+/*const arduinoData="1"; 
 
 io.emit('arduino:data',{data:arduinoData});
 
@@ -82,7 +110,7 @@ io.emit('arduino:data',{data:arduinoData});
 		pyCatcher.stdout.on('data', function(data) {
 			dummyOutput.push(parseFloat(data));
 			console.log(dummyOutput);
-		});
+		});*/
 
   });
 
