@@ -108,6 +108,7 @@ def recTransaction (reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,pro
 
 def sendAccRequest():
         import requests
+        import time
 
         paramsPuntoVenta = getSalesPointParams() # Reads point of sale params from cfg file
         reqApies = paramsPuntoVenta[0]
@@ -139,17 +140,22 @@ def sendAccRequest():
                 "cantidad": prodQuantity, "precUnit": prodUnitPrice, "cambioPrecio": prodPriceChange}], "descuentos": discounts}
 
 
-        #print(todo)
+        # Initiating API request cycle. Will try 3 times or until a 200 status code is received
 
-        response = requests.post(reqApiUlrl, json=todo)
-        #print(response.json())
-        #print(response.status_code)
-        incrTransactNum(int(reqNum))
-        recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, response.status_code, response.json());
+        i=0 #Initial value for the loop counter
+        responseStatus='999'
+        while i<3 :
+            response = requests.post(reqApiUlrl, json=todo)
+            responseStatus=str(response.status_code)
+            incrTransactNum(int(reqNum))
+            recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
+            if responseStatus!="200":
+                time.sleep(2) # Attempt failed. Waiting 2 seconds before next attempt
+            else:
+                 break
+            i=i+1
 
-        print (response.status_code, flush=True, end='')
-
-
+        print (responseStatus, flush=True, end='') #Sending response to js 
 
 
 # Main routine. Selects operation based on input from Arduino
