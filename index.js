@@ -29,9 +29,20 @@ sport.on('data', function(data){
 }); */
 
 
-/* This file is written now to be used with the USB port of an Arduino clone. 
+/* The routine for sport.on below is written now to be used with the USB port of an Arduino clone. 
 In case the Arduino sends the same value multiple times, there is an if statement b
-elow to take only one of those values. */
+elow to take only one of those values. 
+
+Arduino can send the following values: 1: pag QR. 2: pag llenado. 4:incr cuenta botellas. 6: pag insertar 
+contenedor. 0: pag inicio con contador reiniciado. The routine uses only 0, 1 and 4: 0 to reinitiate 
+bottle counter; 4 to increment counter; 1 to send accumulation intention.
+The Siges Python script will have to return a value indicating success or failure sending the 
+accumulation request. In case the accumulation request fails, instead of the QR page the system will have 
+to show a pag  indicating the bottles total and a message to contact personnel on site to do the transaction
+manually. 
+		
+Variable arduinoData holds the value reported by Arduino, which is passed to python
+*/
 
 sport.on('data', function(data){
   
@@ -74,34 +85,7 @@ io.on('connection', onConnection);
 
 server.on("connection", (socket) => {
   console.log(`Cliente conectado`);
-
-//	Command to force a slide change
-
-// data=1: pag QR. =2:pag llenado. =4:incr cuenta botellas. =6: pag insertar 
-// contenedor. =0: pag inicio con contador reiniciado
-// Data passed to Siges Python script: 0 to reinitiate bottle counter; 4 to increment counter; 
-// 1 to send accumulation intention
-// The Siges Python script will have to return a value indicating success or failure sending the 
-// accumulation request. What to do then? A new page may have to be shown indicating the total #
-// of bottles that could not be reported (?) 
-		
-// Variable arduinoData holds the value reported by Arduino, which is passed to
-//index.html and to python
-/*const arduinoData="1"; 
-
-io.emit('arduino:data',{data:arduinoData});
-
-
-    const { spawn } = require ('child_process');
-		const dummyOutput = [];
-
-		const pyCatcher = spawn('python', ['siges_ArduinoInputHandler.py', arduinoData]);
-		pyCatcher.stdout.on('data', function(data) {
-			dummyOutput.push(parseFloat(data));
-			console.log(dummyOutput);
-		});*/
-
-  });
+});
 
 const parsers = SerialPort.parsers;
 const parser = new parsers.Readline({
