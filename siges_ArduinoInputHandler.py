@@ -147,7 +147,7 @@ def sendAccRequest():
         incrTransactNum(int(reqNum))
         recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, response.status_code, response.json());
 
-        print (prodQuantity, flush=True, end='')
+        print (response.status_code, flush=True, end='')
 
 
 
