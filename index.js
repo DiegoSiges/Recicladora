@@ -30,21 +30,13 @@ sport.on('data', function(data){
 
 
 /* This file is written now to be used with the USB port of an Arduino clone. 
-The clone report a USB interface, not an ACM interface, sending the same value
-multiple times. For that reason, there is an if statement below to take only one
-of those values. Still, somehow the siges...py is called multiple times. This
-must be corrected. */
+In case the Arduino sends the same value multiple times, there is an if statement b
+elow to take only one of those values. */
 
 sport.on('data', function(data){
   
   inputData=data.toString();
-  console.log(inputData);
-  /*console.log(inputdata);
-  io.emit('arduino:data', {
-    data:inputdata
-  });*/
-
-
+  
   let arduinoData="7";
 
   if (inputData.search("1")>=0){
@@ -59,12 +51,9 @@ sport.on('data', function(data){
   console.log("ArduinoData: ");
   console.log(arduinoData);
 
-  // const arduinoData="0"; 
-
   io.emit('arduino:data',{data:arduinoData});
 
-
-
+// Spawing the python script to send the accumulation intention request
   const { spawn } = require ('child_process');
   const dummyOutput = [];
 
@@ -129,13 +118,9 @@ function com2Arduino(){
    	
 var i = 0 ;
 sport.pipe(parser);
-//io.emit('arduino:data',"2");
-//console.log("Enviando 2 a Arduino inicio");
 parser.on('data', (data) => {
   console.log(data);
   i = i + 1;
   io.emit('data', { data: data });
   console.log(i);
   });
-console.log("Executes?");
-//setTimeout (com2Arduino, 7000);
