@@ -62,9 +62,11 @@ sport.on('data', function(data){
   console.log("ArduinoData: ");
   console.log(arduinoData);
 
-  io.emit('arduino:data',{data:arduinoData});
+  io.emit('arduino:data',{data:inputData}); // Sending data to index.html
 
 // Spawing the python script to send the accumulation intention request
+// if Arduino data is valid
+  if (arduinoData=="0" || arduinoData=="1" || arduinoData=="4"){
   const { spawn } = require ('child_process');
   const dummyOutput = [];
 
@@ -72,7 +74,7 @@ sport.on('data', function(data){
   pyCatcher.stdout.on('data', function(data) {
     dummyOutput.push(parseFloat(data));
     console.log(dummyOutput);
-  });
+  });}
 
 });
 
