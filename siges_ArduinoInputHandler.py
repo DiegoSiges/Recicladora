@@ -20,14 +20,14 @@ def incrBottleCounter():
     counter+=1
     with open("siges_bottleCounter.cfg", "w") as file:
         file.write(str(counter))
-    return
+    return 200
 
 
 def reinitBottleCounter():
     counter=0
     with open("siges_bottleCounter.cfg", "w") as file:
         file.write(str(counter))
-    return
+    return 200
 
 # Gets the number of bottles. To be used in the API call 
 def getNumBottles():
@@ -143,7 +143,7 @@ def sendAccRequest():
         # Initiating API request cycle. Will try 3 times or until a 200 status code is received
 
         i=0 #Initial value for the loop counter
-        responseStatus='999'
+
         while i<3 :
             response = requests.post(reqApiUlrl, json=todo)
             responseStatus=str(response.status_code)
@@ -155,18 +155,30 @@ def sendAccRequest():
                  break
             i=i+1
 
-        print (responseStatus, flush=True, end='') #Sending response to js 
+        return responseStatus  
 
 
-# Main routine. Selects operation based on input from Arduino
+# Main routine. Selects operation based on input from Arduino. Routine should never receive any value
+# other than 0, 1 or 4
 if input=="0":
-    reinitBottleCounter()
+    try:
+        pyReturn=reinitBottleCounter()
+    except:
+        pyReturn="987"
 elif input== "4":
-    incrBottleCounter()
+    try:
+        pyReturn=incrBottleCounter()
+    except:
+        pyReturn="988"
 elif input== "1":
-    sendAccRequest()
+    try:
+        pyReturn=sendAccRequest()
+    except:
+        pyReturn="989"
 else:
-    print("900", flush=True, end='')
+    pyReturn="990"
+    
+print(pyReturn, flush=True, end='') 
 
 
 
