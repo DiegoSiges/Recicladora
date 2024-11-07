@@ -56,12 +56,12 @@ sport.on('data', function(data){
 // if Arduino data is applicable
   if (arduinoData=="0" || arduinoData=="1" || arduinoData=="4"){
     const { spawn } = require ('child_process');
-    const dummyOutput = [];
+    const pyOutput = [];
 
     const pyCatcher = spawn('python', ['siges_ArduinoInputHandler.py', arduinoData]);
     pyCatcher.stdout.on('data', function(data) {
-      dummyOutput.push(parseFloat(data));
-      console.log(dummyOutput);
+      pyOutput.push(parseFloat(data));
+      console.log(pyOutput);
     });
   }
 });
