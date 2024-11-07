@@ -166,7 +166,7 @@ elif input== "4":
 elif input== "1":
     sendAccRequest()
 else:
-    print("Unknown input")
+    print("900", flush=True, end='')
 
 
 
