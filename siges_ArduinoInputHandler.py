@@ -149,7 +149,7 @@ def sendAccRequest():
             responseStatus=str(response.status_code)
             incrTransactNum(int(reqNum))
             recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
-            if responseStatus!="200":
+            if responseStatus<"200" or responseStatus>"299":
                 time.sleep(2) # Attempt failed. Waiting 2 seconds before next attempt
             else:
                  break
