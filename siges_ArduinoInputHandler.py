@@ -143,16 +143,19 @@ def sendAccRequest():
         # Initiating API request cycle. Will try 3 times or until a 200 status code is received
 
         i=0 #Initial value for the loop counter
-
+        responseStatus=991
         while i<3 :
-            response = requests.post(reqApiUlrl, json=todo)
-            responseStatus=str(response.status_code)
-            incrTransactNum(int(reqNum))
-            recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
-            if responseStatus<"200" or responseStatus>"299":
-                time.sleep(2) # Attempt failed. Waiting 2 seconds before next attempt
-            else:
-                 break
+            try:
+                response = requests.post(reqApiUlrl, json=todo)
+                responseStatus=str(response.status_code)
+                incrTransactNum(int(reqNum))
+                recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
+                if responseStatus<"200" or responseStatus>"299":
+                    time.sleep(2) # Attempt failed on server. Waiting 2 seconds before next attempt
+                else:
+                    break
+            except:
+                    time.sleep(2) # Connection failed. Waiting 2 seconds before next attempt
             i=i+1
 
         return responseStatus  
