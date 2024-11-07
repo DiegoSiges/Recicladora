@@ -33,8 +33,8 @@ sport.on('data', function(data){
 and to siges_ArduinoHandler.py. 
 
 Arduino can send the following values: 1: pag QR. 2: pag llenado. 4:incr cuenta botellas. 6: pag insertar 
-contenedor. 0: pag inicio con contador reiniciado. The routine uses only 0, 1 and 4: 0 to reinitiate 
-bottle counter; 4 to increment counter; 1 to send accumulation intention.
+contenedor. 0: pag inicio con contador reiniciado. The siges_ArduinoHandler acts only on 0, 1 and 4: 0 to 
+reinitiate bottle counter; 4 to increment counter; 1 to send accumulation intention.
 The Siges Python script will have to return a value indicating success or failure sending the 
 accumulation request. In case the accumulation request fails, instead of the QR page the system will have 
 to show a page indicating the bottles total and a message to contact personnel on site to do the transaction
