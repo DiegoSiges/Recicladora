@@ -174,8 +174,9 @@ elif input== "1":
     pyReturn="989" # Value to return in case connection attepts fail 3 times
     i=0 #Initial value for loop counter
     while i<3:
-        try: 
+        try:
             pyReturn=sendAccRequest()
+            break
         except:
             time.sleep(2)
         i=i+1
