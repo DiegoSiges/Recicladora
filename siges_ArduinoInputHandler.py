@@ -6,6 +6,7 @@
 
 
 import sys
+import time
 
 input=sys.argv[1]
 
@@ -108,7 +109,6 @@ def recTransaction (reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,pro
 
 def sendAccRequest():
         import requests
-        import time
 
         paramsPuntoVenta = getSalesPointParams() # Reads point of sale params from cfg file
         reqApies = paramsPuntoVenta[0]
@@ -145,26 +145,23 @@ def sendAccRequest():
         i=0 #Initial value for the loop counter
         responseStatus=991
         while i<3 :
-            try:
-                response = requests.post(reqApiUlrl, json=todo)
-                responseStatus=str(response.status_code)
-                incrTransactNum(int(reqNum))
-                recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
-                if responseStatus<"200" or responseStatus>"299":
-                    time.sleep(2) # Attempt failed on server. Waiting 2 seconds before next attempt
-                else:
-                    break
-            except:
-                    time.sleep(2) # Connection failed. Waiting 2 seconds before next attempt
+            response = requests.post(reqApiUlrl, json=todo)
+            responseStatus=str(response.status_code)
+            incrTransactNum(int(reqNum))
+            recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
+            if responseStatus<"200" or responseStatus>"299":
+                time.sleep(2) # Attempt failed on server. Waiting 2 seconds before next attempt
+            else:
+                break
             i=i+1
 
         return responseStatus  
 
 
 # Main routine. Selects operation based on input from Arduino. Routine should never receive any value
-# other than 0, 1 or 4
+# other than 0, 1 or 4. Any of the called routines will return a value in the 200s if successful.
 if input=="0":
-    try:
+    try: 
         pyReturn=reinitBottleCounter()
     except:
         pyReturn="987"
@@ -174,10 +171,14 @@ elif input== "4":
     except:
         pyReturn="988"
 elif input== "1":
-    try:
-        pyReturn=sendAccRequest()
-    except:
-        pyReturn="989"
+    pyReturn="989" # Value to return in case connection attepts fail 3 times
+    i=0 #Initial value for loop counter
+    while i<3:
+        try: 
+            pyReturn=sendAccRequest()
+        except:
+            time.sleep(2)
+        i=i+1
 else:
     pyReturn="990"
     
