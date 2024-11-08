@@ -62,7 +62,17 @@ sport.on('data', function(data){
     pyCatcher.stdout.on('data', function(data) {
       pyOutput.push(parseFloat(data));
       console.log(pyOutput);
+      if (pyOutput<"200" || pyOutput>"299"){
+        console.log("Bad code");
+        //io.emit('arduino:data',"9");  Sending error code to index.html
+      }
+      else {
+        io.emit('arduino:data',{data:arduinoData}); // Sending data to index.html
+      }
     });
+  }
+  else {
+    io.emit('arduino:data',{data:arduinoData}); // Sending data to index.html
   }
 });
 
