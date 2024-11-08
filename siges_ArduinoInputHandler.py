@@ -164,12 +164,12 @@ if input=="0":
     try: 
         pyReturn=reinitBottleCounter()
     except:
-        pyReturn="987"
+        pyReturn="987" # Bottle counter could not be reinitialized to zero
 elif input== "4":
     try:
         pyReturn=incrBottleCounter()
     except:
-        pyReturn="988"
+        pyReturn="988" # Bottle counter could not be incremented
 elif input== "1":
     i=0 #Initial value for loop counter. Attempting connection 3 times
     while i<3:
