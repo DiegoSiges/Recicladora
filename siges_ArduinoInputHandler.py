@@ -12,9 +12,12 @@ input=sys.argv[1]
 
 
 # Tracks the CodigoQR status in Arduino. Flag equal one to signal CodigoQR, zero to signal no
-# CodigoQR. The function is used to ignore value 1 events received when CodigoQR is set. 
-# In this state, Arduino is currently sending a 1 continuously. All except the first must be 
-# ignored.
+# CodigoQR. The value stored is used to ignore input 1 events (push button), when one of these 
+# events has already been received after a reinitialization (input 4). In CodigoQR state, Arduino 
+# is currently sending a 1 continuously. All except the first must be ignored.
+# In other words, a 1 in this file means that an accumulation request attempt has already been made.
+# This attempt may be successful or not, but no more accumulation request attempts will be made again 
+# until the push button is pressed. In this case Arduino sends a 4, which reinitializes the cycle.  
 
 def setCodigoQRStatus(flag):
     with open("siges_CodigoQRStatus.cfg", "w") as file:
@@ -22,6 +25,11 @@ def setCodigoQRStatus(flag):
     return 200
 
 
+# Reading of the QRStatus
+def getQRStatus():
+    with open("siges_CodigoQRStatus.cfg", "r") as file:
+        status = int(file.readline())
+    return status
 
 
 # Increments counter in bottles counter file
@@ -176,7 +184,7 @@ def sendAccRequest():
 if input=="0":
     try: 
         pyReturn=reinitBottleCounter()
-        setCodigoQRStatus(0)
+        setCodigoQRStatus(0) #Setting it two zero to enable an accumulation request upon next input=1
     except:
         pyReturn="987" # Bottle counter could not be reinitialized to zero
 elif input== "4":
@@ -185,16 +193,19 @@ elif input== "4":
     except:
         pyReturn="988" # Bottle counter could not be incremented
 elif input== "1":
-    setCodigoQRStatus(1)
-    pyReturn="989" # Return code for connection attempts failing 3 times
-    i=0 #Initial value for loop counter. Attempting connection 3 times
-    while i<3:
-        try:
-            pyReturn=sendAccRequest()
-            break
-        except:
-            time.sleep(2)
-        i=i+1
+    if getQRStatus()==0:
+        setCodigoQRStatus(1) # Setting QR status to 1 to prevent sending acc request repeatedly
+        pyReturn="989" # Return code for connection attempts failing 3 times
+        i=0 #Initial value for loop counter. Attempting connection 3 times
+        while i<3:
+            try:
+                pyReturn=sendAccRequest()
+                break
+            except:
+                time.sleep(2)
+            i=i+1
+    else:
+         pyReturn=200
 else:
     pyReturn="990" # Catch all error code
     
