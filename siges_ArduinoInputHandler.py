@@ -11,6 +11,19 @@ import time
 input=sys.argv[1]
 
 
+# Tracks the CodigoQR status in Arduino. Flag equal one to signal CodigoQR, zero to signal no
+# CodigoQR. The function is used to ignore value 1 events received when CodigoQR is set. 
+# In this state, Arduino is currently sending a 1 continuously. All except the first must be 
+# ignored.
+
+def setCodigoQRStatus(flag):
+    with open("siges_CodigoQRStatus.cfg", "w") as file:
+        file.write(str(flag))
+    return 200
+
+
+
+
 # Increments counter in bottles counter file
 def incrBottleCounter():
     counter=0
@@ -163,6 +176,7 @@ def sendAccRequest():
 if input=="0":
     try: 
         pyReturn=reinitBottleCounter()
+        setCodigoQRStatus(0)
     except:
         pyReturn="987" # Bottle counter could not be reinitialized to zero
 elif input== "4":
@@ -171,6 +185,8 @@ elif input== "4":
     except:
         pyReturn="988" # Bottle counter could not be incremented
 elif input== "1":
+    setCodigoQRStatus(1)
+    pyReturn="989" # Return code for connection attempts failing 3 times
     i=0 #Initial value for loop counter. Attempting connection 3 times
     while i<3:
         try:
@@ -179,7 +195,6 @@ elif input== "1":
         except:
             time.sleep(2)
         i=i+1
-    pyReturn="989" # Connection attempts failed 3 times
 else:
     pyReturn="990" # Catch all error code
     
