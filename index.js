@@ -62,7 +62,7 @@ sport.on('data', function(data){
       console.log(pyOutput);
       if (pyOutput<"200" || pyOutput>"299"){
         console.log("Bad code");
-        //io.emit('arduino:data',"9");  Sending error code to index.html
+        io.emit('arduino:data', {data:"9"});  // Sending error code to index.html
       }
       else {
         io.emit('arduino:data',{data:arduinoData}); // Sending data to index.html
