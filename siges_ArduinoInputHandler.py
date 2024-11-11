@@ -6,8 +6,30 @@
 
 
 import sys
+import time
 
 input=sys.argv[1]
+
+
+# Tracks the CodigoQR status in Arduino. Flag equal one to signal CodigoQR, zero to signal no
+# CodigoQR. The value stored is used to ignore input 1 events (push button), when one of these 
+# events has already been received after a reinitialization (input 4). In CodigoQR state, Arduino 
+# is currently sending a 1 continuously. All except the first must be ignored.
+# In other words, a 1 in this file means that an accumulation request attempt has already been made.
+# This attempt may be successful or not, but no more accumulation request attempts will be made again 
+# until the push button is pressed. In this case Arduino sends a 4, which reinitializes the cycle.  
+
+def setCodigoQRStatus(flag):
+    with open("siges_CodigoQRStatus.cfg", "w") as file:
+        file.write(str(flag))
+    return 200
+
+
+# Reading of the QRStatus
+def getQRStatus():
+    with open("siges_CodigoQRStatus.cfg", "r") as file:
+        status = int(file.readline())
+    return status
 
 
 # Increments counter in bottles counter file
@@ -108,7 +130,6 @@ def recTransaction (reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,pro
 
 def sendAccRequest():
         import requests
-        import time
 
         paramsPuntoVenta = getSalesPointParams() # Reads point of sale params from cfg file
         reqApies = paramsPuntoVenta[0]
@@ -145,41 +166,48 @@ def sendAccRequest():
         i=0 #Initial value for the loop counter
         responseStatus=991
         while i<3 :
-            try:
-                response = requests.post(reqApiUlrl, json=todo)
-                responseStatus=str(response.status_code)
-                incrTransactNum(int(reqNum))
-                recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
-                if responseStatus<"200" or responseStatus>"299":
-                    time.sleep(2) # Attempt failed on server. Waiting 2 seconds before next attempt
-                else:
-                    break
-            except:
-                    time.sleep(2) # Connection failed. Waiting 2 seconds before next attempt
+            response = requests.post(reqApiUlrl, json=todo)
+            responseStatus=str(response.status_code)
+            incrTransactNum(int(reqNum))
+            recTransaction(reqApies, reqSalePoint, reqId, reqDate, prodId, prodCode,prodDescription,prodType, prodQuantity, prodUnitPrice, responseStatus, response.json());
+            if responseStatus<"200" or responseStatus>"299":
+                time.sleep(2) # Attempt failed on server. Waiting 2 seconds before next attempt
+            else:
+                break
             i=i+1
 
         return responseStatus  
 
 
 # Main routine. Selects operation based on input from Arduino. Routine should never receive any value
-# other than 0, 1 or 4
+# other than 0, 1 or 4. Any of the called routines will return a value in the 200s if successful.
 if input=="0":
-    try:
+    try: 
         pyReturn=reinitBottleCounter()
+        setCodigoQRStatus(0) #Setting it two zero to enable an accumulation request upon next input=1
     except:
-        pyReturn="987"
+        pyReturn="987" # Bottle counter could not be reinitialized to zero
 elif input== "4":
     try:
         pyReturn=incrBottleCounter()
     except:
-        pyReturn="988"
+        pyReturn="988" # Bottle counter could not be incremented
 elif input== "1":
-    try:
-        pyReturn=sendAccRequest()
-    except:
-        pyReturn="989"
+    if getQRStatus()==0:
+        setCodigoQRStatus(1) # Setting QR status to 1 to prevent sending acc request repeatedly
+        pyReturn="989" # Return code for connection attempts failing 3 times
+        i=0 #Initial value for loop counter. Attempting connection 3 times
+        while i<3:
+            try:
+                pyReturn=sendAccRequest()
+                break
+            except:
+                time.sleep(2)
+            i=i+1
+    else:
+         pyReturn=200
 else:
-    pyReturn="990"
+    pyReturn="990" # Catch all error code
     
 print(pyReturn, flush=True, end='') 
 

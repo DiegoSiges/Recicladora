@@ -50,10 +50,8 @@ sport.on('data', function(data){
   console.log("ArduinoData: ");
   console.log(arduinoData);
 
-  io.emit('arduino:data',{data:arduinoData}); // Sending data to index.html
-
 // Spawing the python script to send the accumulation intention request
-// if Arduino data is applicable
+// if Arduino data is applicable 
   if (arduinoData=="0" || arduinoData=="1" || arduinoData=="4"){
     const { spawn } = require ('child_process');
     const pyOutput = [];
