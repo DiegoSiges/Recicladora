@@ -26,13 +26,21 @@
 
                 <!-- Imagen de la pantalla -->
                 <div class="">
+                    <!--div id="error_message" style="display: none; position: relative; top: 20%; left: 0%;z-index: 2; color:white; background-color: red; padding: 20px; border-radius: 10px;">
+                        <h1>Conexión a la nube falló</h1>
+                    </div -->
                     <div class="">
                         <img src="./static/images/contador-botella.jpeg">                    
                     </div>
                     <div style=" position: absolute; z-index: 1; color: blue; font-size: 11px">
                         <h1 style="position: relative; left: 540px; bottom: 225px; background-color:; text-align:center; width: 190px; color: #1D2FB5"
-				class="numero_botellas" id="botellas">0</h1>
+				        class="numero_botellas" id="botellas">0</h1>
                     </div>
+                    <div style=" position: absolute; z-index: 1; color: blue; font-size: 11px">
+                        <div id="error_message" style="display: none; position: relative; bottom: 300px; left: 0px; width: 450px; height: 215px; z-index: 2; color:white; background-color: red; padding: 20px; border-radius: 10px;">
+                            <h1>Conexión a la nube falló. Contáctese con personal para carga manual</h1>
+                        </div>
+                    </div>                    
                 </div>
 
                 <!-- Numero para contar -->
@@ -151,6 +159,11 @@
             else if (data == 4) {
                 incrementar(); //Cuenta las botellas
             }
+            else if (data == 9) {
+                const error_message = document.getElementById('error_message');
+                error_message.style.display = 'block';
+                location.href = '#page1/'
+            }
             else if (data == 0) {
                 clearAll(); // Vuelve a la pantalla de contar y reinicia el contador
                 location.href = '#page1/';
@@ -185,6 +198,8 @@
         }
 
         const clearAll = () => {
+            const error_message = document.getElementById('error_message');
+            error_message.style.display = 'none'; // Turning the error message invisible
             qrcode.clear();
             input_botellas = 0;
             botellas = 0;
