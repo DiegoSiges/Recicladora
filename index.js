@@ -24,14 +24,6 @@ app.use(express.static('public'));
   console.log('Puerto abierto');
 });
 
-/* Original sport.on function. Modified below  
-sport.on('data', function(data){
-  console.log(data.toString());
-  io.emit('arduino:data', {
-    data:data.toString()
-  });
-}); */
-
 
 /* The routine for sport.on below is handles the input from Arduino, deriving the value to index.html 
 and to siges_ArduinoHandler.py. 
@@ -56,13 +48,9 @@ sport.on('data', function(data){
   console.log("ArduinoData: ");
   console.log(arduinoData);
 
-// Spawing the python script to send the accumulation intention request
+// Spawning the python script to send the accumulation intention request
 // if Arduino data is applicable. First, must check if 3 minutes elapsed
 // since a connection attempt failure. 
-
-  console.log("conn times ");
-  console.log(connAttemptFailTime);
-  console.log(`Curr time ${Date.now()}`);
 
   if (connAttemptFailFlag==0) {
 
@@ -77,10 +65,9 @@ sport.on('data', function(data){
         if (pyOutput<"200" || pyOutput>"299"){
           console.log("Bad code");
         
-          connAttemptFailFlag = 1;
+          connAttemptFailFlag = 1; // Setting connection failure flag and reading time
           connAttemptFailTime = Date.now();
 
-          // console.log(connAttemptFailTime);
           io.emit('arduino:data', {data:"9"});  // Sending error code to index.html
         }
         else {
@@ -112,13 +99,6 @@ const parsers = SerialPort.parsers;
 const parser = new parsers.Readline({
   delimiter: '\n'
 });
-
-
-function com2Arduino(){
-	io.emit('arduino:data', {data:"0"});
-	console.log("2 to Arduino from within function");
-}
-
 
    	
 var i = 0 ;
