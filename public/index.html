@@ -26,9 +26,6 @@
 
                 <!-- Imagen de la pantalla -->
                 <div class="">
-                    <!--div id="error_message" style="display: none; position: relative; top: 20%; left: 0%;z-index: 2; color:white; background-color: red; padding: 20px; border-radius: 10px;">
-                        <h1>Conexión a la nube falló</h1>
-                    </div -->
                     <div class="">
                         <img src="./static/images/contador-botella.jpeg">                    
                     </div>
@@ -60,12 +57,7 @@
                     </div>
                     <!-- Cuadro de QR -->
                     <div style="position: relative; z-index: 1; border: 1px solid black;">
-                        <div style="position: absolute; right:73px; bottom: 202px;background: #ffff; padding: 10px; border:1px solid white">
-                            <div id="qrcode"></div>
-                        </div>
-                    <!--/div-->
-<!-- Adding the static image on top of the qr code because when the qrcode is eliminated, the script stops responding to Arduino inputs. 
- Check later how to eliminate qrcode.-->                    
+<!-- Superimposing the static qr code instead of the original dynamic qr code on top of the static image.-->                    
                         <div style="position: absolute; right:73px; bottom: 202px;background: #ffff; padding: 10px; border:1px solid white">
                             <div> 
                                 <img src="./static/images/QR_Sample.png" width="256" height="256"> 
@@ -99,7 +91,6 @@
     <script src="./static/js/bootstrap.min.js"></script>
     <script src="./static/js/jquery.fullPage.js"></script>
     <script src="./static/js/socketio.js"></script>
-    <script src="./static/js/qrcode.js"></script>
     <script src="./static/js/hashids.js"></script>
 
 
@@ -120,7 +111,6 @@
         var ecobillete = 1;
         var date;
         var socket = io.connect('http://localhost:3000');
-        var qrcode = new QRCode("qrcode");
         var hashids = new Hashids("cwejjwevfewiufghewoeofhweco", 20);
         var uuid = createUUID();
         var id_maquina = 513; 	
@@ -194,13 +184,11 @@
         const codeGen = () => {
             date = new Date();
             var code = hashids.encode([botellas, maquina, date.getMonth(), date.getDay(), date.getHours(), date.getMinutes(), id_maquina, uuid, createUUID()]);
-            qrcode.makeCode(code);
         }
 
         const clearAll = () => {
             const error_message = document.getElementById('error_message');
             error_message.style.display = 'none'; // Turning the error message invisible
-            qrcode.clear();
             input_botellas = 0;
             botellas = 0;
             contador_botellas.innerHTML = 0;
