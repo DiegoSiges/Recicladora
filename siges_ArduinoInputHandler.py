@@ -138,7 +138,11 @@ def sendAccRequest():
         # Print the retrieved data
         # print(f"apies {reqApies}\npuntoVenta: {reqSalePoint}")
 
+        #URI de testeo
         reqApiUlrl = "https://siges.dev/api/YVOSGenerarAcumulacion"
+        
+        # URI de producción
+        # reqApiUlrl = "https://siges.info/api/YVOSGenerarAcumulacion"
 
         reqNum = getNumTransaction()
         reqId = f"Y_{reqApies}_Surtidor{reqSalePoint}_{reqNum}"
@@ -149,7 +153,7 @@ def sendAccRequest():
         prodDescription = "Reciclado"
         prodType = "store"
         prodQuantity = getNumBottles()
-        prodUnitPrice = 0.01
+        prodUnitPrice = 0.1
         prodPriceChange = False
         discounts = None
 
